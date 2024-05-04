@@ -73,27 +73,5 @@ const updateOpacity = () => {
 
 window.addEventListener('scroll', updateOpacity);
 
-
-// let observer = new IntersectionObserver((entries) => {
-//         entries.forEach((entry) => {
-//         console.log(scrollPercent)
-//         if (scrollPercent >= 95) {
-//             entry.target.style.animation = 'fade 2s ease both';
-//             console.log("HERE")
-//         } else {
-//             entry.target.style.animation = '';
-//         }
-//     });
-// });
-
-// let links = document.querySelector('#links');
-
-// window.addEventListener('scroll', () => {
-//     const scrollPercent = (html.scrollTop + window.innerHeight) / html.scrollHeight * 100;
-//     if (scrollPercent >= 95) {
-//         // Perform your action here when the user has scrolled 95% of the page
-//     }
-// });
-
 preloadImages();
 setupLinkControl();

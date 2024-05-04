@@ -59,3 +59,12 @@ canvas {
     from {opacity: 0;}
     to {opacity: 1;}
   }
+
+#pleaserotate-graphic{
+    fill: #fff;
+}
+
+#pleaserotate-backdrop {
+    color: #fff;
+    background-color: #000;
+}
