@@ -1,0 +1,56 @@
+const html = document.documentElement;
+const canvas = document.getElementById("animation");
+const context = canvas.getContext("2d");
+
+const frameCount = 2130;
+const currentFrame = index => (
+    `./frames/out${index.toString()}.jpg`
+)
+
+const preloadImages = () => {
+    for (let i = 1; i < frameCount; i++) {
+        const img = new Image();
+        img.src = currentFrame(i);
+    }
+};
+
+const img = new Image()
+img.src = currentFrame(1);
+canvas.width=1920;
+canvas.height=1080;
+img.onload=function(){
+    context.drawImage(img, 0, 0);
+}
+
+const updateImage = index => {
+    img.src = currentFrame(index);
+    context.drawImage(img, 0, 0);
+}
+
+const setupLinkControl = () => {
+    const links = document.querySelectorAll('#links a');
+    links.forEach(link => {
+        link.addEventListener('click', (event) => {
+            const scrollPercent = 100 * html.scrollTop / (html.scrollHeight - window.innerHeight);
+            if (scrollPercent < 95) {
+                event.preventDefault();
+            }
+        });
+    });
+};
+
+
+window.addEventListener('scroll', () => {  
+    const scrollTop = html.scrollTop;
+    const maxScrollTop = html.scrollHeight - window.innerHeight;
+    const scrollFraction = scrollTop / maxScrollTop;
+    const frameIndex = Math.min(
+        frameCount - 1,
+        Math.ceil(scrollFraction * frameCount)
+    );
+    
+    requestAnimationFrame(() => updateImage(frameIndex + 1));
+});
+
+preloadImages();
+setupLinkControl();
