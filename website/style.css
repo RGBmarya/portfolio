@@ -29,9 +29,6 @@ canvas {
     color: white;
     filter: invert(100%);
     gap: calc(5px + 2vw);
-    opacity: 0; /* Starts invisible */
-    animation: fade 2s ease both; /* Animation applied here */
-    animation-timeline: scroll();
 }
 
 #links a {
@@ -59,10 +56,6 @@ canvas {
 }
 
 @keyframes fade {
-    95% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }

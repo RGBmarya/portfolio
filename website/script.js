@@ -40,7 +40,13 @@ const setupLinkControl = () => {
 };
 
 
-window.addEventListener('scroll', () => {  
+let curOpacity = 0;
+let links = document.querySelectorAll('#links a');
+links.forEach(link => {
+    link.style.opacity = curOpacity;
+});
+
+const updateOpacity = () => {
     const scrollTop = html.scrollTop;
     const maxScrollTop = html.scrollHeight - window.innerHeight;
     const scrollFraction = scrollTop / maxScrollTop;
@@ -50,7 +56,44 @@ window.addEventListener('scroll', () => {
     );
     
     requestAnimationFrame(() => updateImage(frameIndex + 1));
-});
+    const scrollPercent = (html.scrollTop + window.innerHeight) / html.scrollHeight * 100;
+    if (scrollPercent >= 95) {
+        curOpacity = (scrollPercent - 95) / 5;
+        if (curOpacity > 1) {
+            curOpacity = 1;
+        }
+    }
+    else {
+        curOpacity = 0;
+    }
+    links.forEach(link => {
+        link.style.opacity = curOpacity;
+    });
+};
+
+window.addEventListener('scroll', updateOpacity);
+
+
+// let observer = new IntersectionObserver((entries) => {
+//         entries.forEach((entry) => {
+//         console.log(scrollPercent)
+//         if (scrollPercent >= 95) {
+//             entry.target.style.animation = 'fade 2s ease both';
+//             console.log("HERE")
+//         } else {
+//             entry.target.style.animation = '';
+//         }
+//     });
+// });
+
+// let links = document.querySelector('#links');
+
+// window.addEventListener('scroll', () => {
+//     const scrollPercent = (html.scrollTop + window.innerHeight) / html.scrollHeight * 100;
+//     if (scrollPercent >= 95) {
+//         // Perform your action here when the user has scrolled 95% of the page
+//     }
+// });
 
 preloadImages();
 setupLinkControl();
