@@ -16,7 +16,6 @@ canvas {
     max-height: 100vh;
     max-width: 100vw;
 }
-
 #links {
     display: flex;
     justify-content: center;
