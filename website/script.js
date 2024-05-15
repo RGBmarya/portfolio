@@ -2,7 +2,7 @@ const html = document.documentElement;
 const canvas = document.getElementById("animation");
 const context = canvas.getContext("2d");
 
-const frameCount = 2130;
+const frameCount = 1530;
 const currentFrame = index => (
     `./frames/out${index.toString()}.jpg`
 )
