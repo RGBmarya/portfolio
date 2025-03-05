@@ -5,27 +5,59 @@ const context = canvas.getContext("2d");
 const frameCount = 1530;
 const currentFrame = index => (
     `./frames/out${index.toString()}.jpg`
-)
+);
 
+// Cache for loaded images
+const imageCache = new Map();
+
+// Preload images with a limit to prevent memory issues
 const preloadImages = () => {
-    for (let i = 1; i < frameCount; i++) {
-        const img = new Image();
-        img.src = currentFrame(i);
-    }
+    const batchSize = 50;
+    let currentBatch = 0;
+    
+    const loadBatch = () => {
+        const start = currentBatch * batchSize + 1;
+        const end = Math.min(start + batchSize - 1, frameCount);
+        
+        for (let i = start; i <= end; i++) {
+            if (!imageCache.has(i)) {
+                const img = new Image();
+                img.src = currentFrame(i);
+                imageCache.set(i, img);
+            }
+        }
+        
+        currentBatch++;
+        if (currentBatch * batchSize < frameCount) {
+            setTimeout(loadBatch, 100);
+        }
+    };
+    
+    loadBatch();
 };
 
-const img = new Image()
-img.src = currentFrame(1);
-canvas.width=1920;
-canvas.height=1080;
-img.onload=function(){
-    context.drawImage(img, 0, 0);
-}
+// Initialize canvas
+canvas.width = 1920;
+canvas.height = 1080;
 
-const updateImage = index => {
-    img.src = currentFrame(index);
-    context.drawImage(img, 0, 0);
-}
+// Throttle function to limit function calls
+const throttle = (func, limit) => {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+};
+
+const updateImage = (index) => {
+    const img = imageCache.get(index);
+    if (img) {
+        context.drawImage(img, 0, 0);
+    }
+};
 
 const setupLinkControl = () => {
     const links = document.querySelectorAll('#links a');
@@ -39,9 +71,8 @@ const setupLinkControl = () => {
     });
 };
 
-
 let curOpacity = 0;
-let links = document.querySelectorAll('#links a');
+const links = document.querySelectorAll('#links a');
 links.forEach(link => {
     link.style.opacity = curOpacity;
 });
@@ -55,23 +86,26 @@ const updateOpacity = () => {
         Math.ceil(scrollFraction * frameCount)
     );
     
-    requestAnimationFrame(() => updateImage(frameIndex + 1));
-    const scrollPercent = (html.scrollTop + window.innerHeight) / html.scrollHeight * 100;
-    if (scrollPercent >= 95) {
-        curOpacity = (scrollPercent - 95) / 5;
-        if (curOpacity > 1) {
-            curOpacity = 1;
+    // Use requestAnimationFrame for smooth animation
+    requestAnimationFrame(() => {
+        updateImage(frameIndex + 1);
+        
+        const scrollPercent = (html.scrollTop + window.innerHeight) / html.scrollHeight * 100;
+        if (scrollPercent >= 95) {
+            curOpacity = Math.min(1, (scrollPercent - 95) / 5);
+        } else {
+            curOpacity = 0;
         }
-    }
-    else {
-        curOpacity = 0;
-    }
-    links.forEach(link => {
-        link.style.opacity = curOpacity;
+        
+        links.forEach(link => {
+            link.style.opacity = curOpacity;
+        });
     });
 };
 
-window.addEventListener('scroll', updateOpacity);
+// Throttle scroll event to improve performance
+window.addEventListener('scroll', throttle(updateOpacity, 16)); // ~60fps
 
+// Initialize
 preloadImages();
 setupLinkControl();
